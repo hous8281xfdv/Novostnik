@@ -160,25 +160,10 @@ body {
     width: 100%;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
-.welcome-card i {
-    font-size: 4rem;
-    color: #ff7e33;
-    margin-bottom: 20px;
-}
-.welcome-card h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-.welcome-card p {
-    color: #666;
-    margin-bottom: 30px;
-}
-.welcome-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-bottom: 30px;
-}
+.welcome-card i { font-size: 4rem; color: #ff7e33; margin-bottom: 20px; }
+.welcome-card h1 { font-size: 2rem; margin-bottom: 10px; }
+.welcome-card p { color: #666; margin-bottom: 30px; }
+.welcome-buttons { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; }
 .btn-primary {
     background: #ff7e33;
     color: white;
@@ -197,16 +182,10 @@ body {
     font-weight: 600;
     cursor: pointer;
 }
-.support-link {
-    font-size: 0.8rem;
-    color: #999;
-}
-.support-link a {
-    color: #ff7e33;
-    text-decoration: none;
-}
+.support-link { font-size: 0.8rem; color: #999; }
+.support-link a { color: #ff7e33; text-decoration: none; }
 
-/* Посты (как VK) */
+/* Посты */
 .post-card {
     background: white;
     border-radius: 16px;
@@ -228,7 +207,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     color: white;
 }
 .post-author-info h3 { font-size: 1rem; margin-bottom: 2px; }
@@ -271,6 +250,11 @@ body {
 
 /* Админка */
 .admin-block { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; }
+.admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #edeef0; padding-bottom: 10px; }
+.admin-tab { background: none; border: none; padding: 8px 16px; cursor: pointer; border-radius: 20px; font-weight: 500; }
+.admin-tab.active { background: #ff7e33; color: white; }
+.admin-tab-content { display: none; }
+.admin-tab-content.active { display: block; }
 .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
 .add-post-btn {
     background: #ff7e33;
@@ -280,7 +264,7 @@ body {
     color: white;
     cursor: pointer;
 }
-.admin-post-item {
+.admin-post-item, .moderation-item {
     background: #f5f6f8;
     padding: 12px;
     border-radius: 16px;
@@ -291,7 +275,7 @@ body {
     flex-wrap: wrap;
     gap: 10px;
 }
-.admin-post-item button {
+.admin-post-item button, .moderation-item button {
     background: none;
     border: none;
     padding: 4px 12px;
@@ -300,6 +284,8 @@ body {
 }
 .admin-post-item button:first-child { background: #ff7e33; color: white; }
 .admin-post-item button:last-child { background: #c0392b; color: white; }
+.moderation-item button.approve { background: #2d4a2d; color: white; margin-right: 5px; }
+.moderation-item button.reject { background: #c0392b; color: white; }
 
 .create-post-card {
     background: white;
@@ -353,7 +339,7 @@ body {
     max-height: 85vh;
     overflow-y: auto;
 }
-.close, .close-comments, .close-login, .close-register {
+.close, .close-comments, .close-login, .close-register, .close-propose {
     float: right;
     font-size: 28px;
     cursor: pointer;
@@ -396,7 +382,7 @@ form input, form textarea {
 /* Тёмная тема */
 body.dark-theme { background: #121212; color: #e0e0e0; }
 body.dark-theme .header, body.dark-theme .post-card, body.dark-theme .admin-block, body.dark-theme .modal-content, body.dark-theme .create-post-card, body.dark-theme .mobile-nav, body.dark-theme .welcome-card { background: #1e1e1e; color: #e0e0e0; }
-body.dark-theme .admin-post-item, body.dark-theme .comment-item { background: #2a2a2a; }
+body.dark-theme .admin-post-item, body.dark-theme .comment-item, body.dark-theme .moderation-item { background: #2a2a2a; }
 body.dark-theme .create-post-input { background: #2a2a2a; color: #aaa; }
 body.dark-theme .post-stats { border-color: #2a2a2a; }
 body.dark-theme .welcome-card p { color: #aaa; }
