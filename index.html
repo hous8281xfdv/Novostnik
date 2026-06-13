@@ -23,22 +23,18 @@
         <ul>
             <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
             <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
+            <li><a href="#" id="mobileLoginLink"><i class="fas fa-sign-in-alt"></i> Вход</a></li>
             <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
         </ul>
     </nav>
 
     <header class="header">
         <div class="container">
-            <div class="logo">
-                <i class="fas fa-newspaper"></i>
-                <span>Лента</span>
-            </div>
+            <div class="logo"><i class="fas fa-newspaper"></i><span>Лента</span></div>
             <div class="header-actions">
                 <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
-                <div id="google-login" class="google-login"></div>
                 <div class="user-profile" id="userProfile" style="display: none;">
-                    <img id="userAvatar" src="" alt="">
-                    <span id="userName"></span>
+                    <img id="userAvatar" src="" alt=""><span id="userName"></span>
                     <button id="logoutBtn" class="logout-small"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
                 <button id="adminPanelBtn" class="admin-panel-btn"><i class="fas fa-user-shield"></i></button>
@@ -58,14 +54,21 @@
                 <div id="postsFeed" class="posts-feed"></div>
             </div>
             <div id="adminBlock" class="admin-block" style="display: none;">
-                <div class="admin-header">
-                    <h2>Управление постами</h2>
-                    <button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button>
-                </div>
+                <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
                 <div id="adminPostsList"></div>
             </div>
         </div>
     </main>
+
+    <!-- Модалка входа -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-login">&times;</span>
+            <h2><i class="fab fa-google"></i> Вход через Google</h2>
+            <p>Для лайков, комментариев и создания постов необходимо войти в аккаунт.</p>
+            <div id="google-login-modal" class="google-login-center"></div>
+        </div>
+    </div>
 
     <!-- Модалка поста -->
     <div id="postModal" class="modal">
@@ -75,12 +78,10 @@
             <form id="postForm">
                 <input type="text" id="postTitle" placeholder="Заголовок" required>
                 <textarea id="postContent" rows="4" placeholder="Что произошло?" required></textarea>
-                <div class="image-upload-area">
-                    <input type="text" id="postImageUrl" placeholder="Ссылка на картинку">
-                    <div class="or-divider">или</div>
-                    <input type="file" id="postImageFile" accept="image/*">
-                    <div id="imagePreview" class="image-preview"></div>
-                </div>
+                <input type="text" id="postImageUrl" placeholder="Ссылка на картинку">
+                <div class="or-divider">или</div>
+                <input type="file" id="postImageFile" accept="image/*">
+                <div id="imagePreview" class="image-preview"></div>
                 <input type="hidden" id="editPostId">
                 <button type="submit" class="btn-submit">Опубликовать</button>
             </form>
@@ -93,19 +94,12 @@
             <span class="close-comments">&times;</span>
             <h2>Комментарии</h2>
             <div id="commentsList" class="comments-list"></div>
-            <div class="add-comment">
-                <textarea id="newCommentText" rows="2" placeholder="Напишите комментарий..."></textarea>
-                <button id="submitCommentBtn" class="btn-submit">Отправить</button>
-            </div>
+            <textarea id="newCommentText" rows="2" placeholder="Напишите комментарий..."></textarea>
+            <button id="submitCommentBtn" class="btn-submit">Отправить</button>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <p>© 2026 Новостной канал</p>
-        </div>
-    </footer>
-
+    <footer class="footer"><div class="container"><p>© 2026 Новостной канал</p></div></footer>
     <script src="script.js"></script>
 </body>
 </html>
