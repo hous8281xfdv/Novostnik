@@ -12,7 +12,6 @@
 
     <div id="toast" class="toast"></div>
 
-    <!-- Бургер-меню -->
     <div class="burger-menu" id="burgerMenu">
         <div class="burger-line line1"></div>
         <div class="burger-line line2"></div>
@@ -44,7 +43,6 @@
 
     <main>
         <div class="container">
-            <!-- Главный экран -->
             <div id="welcomeBlock" class="welcome-block">
                 <div class="welcome-card">
                     <i class="fas fa-newspaper"></i>
@@ -58,7 +56,6 @@
                 </div>
             </div>
 
-            <!-- Лента -->
             <div id="feedBlock" style="display: none;">
                 <div class="create-post-card" id="createPostCard" style="display: none;">
                     <div class="create-post-header">
@@ -69,11 +66,10 @@
                 <div id="postsFeed" class="posts-feed"></div>
             </div>
 
-            <!-- Админка -->
             <div id="adminBlock" class="admin-block" style="display: none;">
                 <div class="admin-tabs">
                     <button class="admin-tab active" data-tab="postsTab">📝 Посты</button>
-                    <button class="admin-tab" data-tab="moderationTab">⏳ Модерация</button>
+                    <button class="admin-tab" data-tab="moderationTab">⏳ Модерация (<span id="moderationCount">0</span>)</button>
                 </div>
                 <div id="postsTab" class="admin-tab-content active">
                     <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
@@ -87,7 +83,7 @@
         </div>
     </main>
 
-    <!-- Модалка входа -->
+    <!-- Модалки -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-login">&times;</span>
@@ -103,7 +99,6 @@
         </div>
     </div>
 
-    <!-- Модалка регистрации -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <span class="close-register">&times;</span>
@@ -123,7 +118,6 @@
         </div>
     </div>
 
-    <!-- Модалка предложения поста -->
     <div id="proposeModal" class="modal">
         <div class="modal-content">
             <span class="close-propose">&times;</span>
@@ -141,7 +135,6 @@
         </div>
     </div>
 
-    <!-- Модалка поста (админ) -->
     <div id="postModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -159,7 +152,6 @@
         </div>
     </div>
 
-    <!-- Модалка комментариев -->
     <div id="commentsModal" class="modal">
         <div class="modal-content">
             <span class="close-comments">&times;</span>
