@@ -166,7 +166,7 @@ function renderAdminPosts() {
     container.innerHTML = sorted.map(post => `
         <div class="admin-post-item">
             <div><strong>${escapeHtml(post.title)}</strong><br><small>${new Date(post.date).toLocaleDateString()}</small></div>
-            <div><button class="edit-post-admin" data-id="${post.id}" style="background:#ff7e33; border:none; padding:6px 12px; border-radius:20px; color:white; margin-right:8px;">Ред.</button><button class="delete-post-admin" data-id="${post.id}" style="background:#c0392b; border:none; padding:6px 12px; border-radius:20px; color:white;">Удалить</button></div>
+            <div><button class="edit-post-admin" data-id="${post.id}">Ред.</button><button class="delete-post-admin" data-id="${post.id}">Удалить</button></div>
         </div>
     `).join('');
     document.querySelectorAll('.edit-post-admin').forEach(btn => btn.addEventListener('click', () => openPostEditor(btn.dataset.id)));
@@ -200,30 +200,57 @@ function openPostEditor(id = null) {
     modal.style.display = 'block';
 }
 
-document.getElementById('postForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = document.getElementById('postTitle').value.trim();
-    const content = document.getElementById('postContent').value.trim();
-    let imageUrl = document.getElementById('postImageUrl').value.trim();
-    const file = document.getElementById('postImageFile').files[0];
-    const editId = document.getElementById('editPostId').value;
-    if (!title || !content) { showToast('Заголовок и текст обязательны', true); return; }
-    const save = (url) => {
-        if (editId) {
-            const idx = posts.findIndex(p => p.id == editId);
-            if (idx !== -1) posts[idx] = { ...posts[idx], title, content, imageUrl: url, date: new Date().toISOString() };
-        } else {
-            posts.push({ id: Date.now(), title, content, imageUrl: url, date: new Date().toISOString(), likes: [], comments: [] });
+// === ФОРМА СОЗДАНИЯ ПОСТА (ПОЧИНЕНА) ===
+const postForm = document.getElementById('postForm');
+if (postForm) {
+    postForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Форма отправлена'); // для проверки в консоли
+        
+        const title = document.getElementById('postTitle').value.trim();
+        const content = document.getElementById('postContent').value.trim();
+        let imageUrl = document.getElementById('postImageUrl').value.trim();
+        const file = document.getElementById('postImageFile').files[0];
+        const editId = document.getElementById('editPostId').value;
+        
+        if (!title || !content) {
+            showToast('Заголовок и текст обязательны', true);
+            return;
         }
-        savePosts();
-        renderPosts();
-        if (isAdminMode) renderAdminPosts();
-        closeModal(document.getElementById('postModal'));
-        showToast(editId ? 'Пост обновлён' : 'Пост создан');
-    };
-    if (file) { const reader = new FileReader(); reader.onload = (ev) => save(ev.target.result); reader.readAsDataURL(file); }
-    else save(imageUrl);
-});
+        
+        const save = (url) => {
+            if (editId) {
+                const idx = posts.findIndex(p => p.id == editId);
+                if (idx !== -1) {
+                    posts[idx] = { ...posts[idx], title, content, imageUrl: url, date: new Date().toISOString() };
+                }
+            } else {
+                posts.push({
+                    id: Date.now(),
+                    title,
+                    content,
+                    imageUrl: url,
+                    date: new Date().toISOString(),
+                    likes: [],
+                    comments: []
+                });
+            }
+            savePosts();
+            renderPosts();
+            if (isAdminMode) renderAdminPosts();
+            closeModal(document.getElementById('postModal'));
+            showToast(editId ? 'Пост обновлён' : 'Пост создан');
+        };
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => save(ev.target.result);
+            reader.readAsDataURL(file);
+        } else {
+            save(imageUrl);
+        }
+    });
+}
 
 // === КОММЕНТАРИИ ===
 function openCommentsModal(postId) {
@@ -244,7 +271,7 @@ function openCommentsModal(postId) {
     }
 }
 
-document.getElementById('submitCommentBtn').addEventListener('click', () => {
+document.getElementById('submitCommentBtn')?.addEventListener('click', () => {
     const text = document.getElementById('newCommentText').value;
     if (addComment(currentCommentPostId, text)) {
         document.getElementById('newCommentText').value = '';
@@ -253,7 +280,7 @@ document.getElementById('submitCommentBtn').addEventListener('click', () => {
 });
 
 // === НАВИГАЦИЯ ===
-document.getElementById('adminPanelBtn').addEventListener('click', () => {
+document.getElementById('adminPanelBtn')?.addEventListener('click', () => {
     const pwd = prompt('Введите пароль администратора:');
     if (pwd === ADMIN_PASSWORD) {
         isAdminMode = true;
@@ -264,9 +291,9 @@ document.getElementById('adminPanelBtn').addEventListener('click', () => {
     } else showToast('Неверный пароль', true);
 });
 
-document.getElementById('mobileAdminLink').addEventListener('click', (e) => {
+document.getElementById('mobileAdminLink')?.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('mobileNav').classList.remove('active');
+    document.getElementById('mobileNav')?.classList.remove('active');
     const pwd = prompt('Введите пароль администратора:');
     if (pwd === ADMIN_PASSWORD) {
         isAdminMode = true;
@@ -277,41 +304,47 @@ document.getElementById('mobileAdminLink').addEventListener('click', (e) => {
     } else showToast('Неверный пароль', true);
 });
 
-document.getElementById('mobileFeedLink').addEventListener('click', (e) => {
+document.getElementById('mobileFeedLink')?.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('mobileNav').classList.remove('active');
+    document.getElementById('mobileNav')?.classList.remove('active');
     document.getElementById('adminBlock').style.display = 'none';
     renderPosts();
 });
 
-document.getElementById('mobileLoginLink').addEventListener('click', (e) => {
+document.getElementById('mobileLoginLink')?.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById('mobileNav').classList.remove('active');
+    document.getElementById('mobileNav')?.classList.remove('active');
     showLoginModal();
 });
 
-document.getElementById('openEditorBtn').addEventListener('click', () => openPostEditor());
-document.getElementById('addPostBtn').addEventListener('click', () => openPostEditor());
-document.getElementById('logoutBtn').addEventListener('click', logout);
+document.getElementById('openEditorBtn')?.addEventListener('click', () => openPostEditor());
+document.getElementById('addPostBtn')?.addEventListener('click', () => openPostEditor());
+document.getElementById('logoutBtn')?.addEventListener('click', logout);
 
-function showLoginModal() { document.getElementById('loginModal').style.display = 'block'; }
-document.getElementById('loginForm').addEventListener('submit', (e) => {
+function showLoginModal() { 
+    const modal = document.getElementById('loginModal');
+    if (modal) modal.style.display = 'block'; 
+}
+document.getElementById('loginForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const phone = document.getElementById('loginPhone').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
     if (!phone || !password) { showToast('Заполните телефон и пароль', true); return; }
-    if (loginOrRegister(phone, password)) closeModal(document.getElementById('loginModal'));
+    if (loginOrRegister(phone, password)) {
+        const modal = document.getElementById('loginModal');
+        if (modal) modal.style.display = 'none';
+    }
 });
 
 // Тёмная тема
-document.getElementById('themeToggle').addEventListener('click', () => {
+document.getElementById('themeToggle')?.addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
     localStorage.setItem('blogTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
 });
-document.getElementById('themeToggleMobile').addEventListener('click', () => {
+document.getElementById('themeToggleMobile')?.addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
     localStorage.setItem('blogTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    document.getElementById('mobileNav').classList.remove('active');
+    document.getElementById('mobileNav')?.classList.remove('active');
 });
 if (localStorage.getItem('blogTheme') === 'dark') document.body.classList.add('dark-theme');
 
@@ -339,12 +372,17 @@ window.onclick = (e) => {
 
 function showToast(msg, isErr = false) {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.innerText = msg;
     toast.style.background = isErr ? '#c0392b' : '#2d4a2d';
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
-function escapeHtml(str) { return str ? str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;') : ''; }
+
+function escapeHtml(str) { 
+    if (!str) return '';
+    return str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); 
+}
 
 loadData();
 renderPosts();
