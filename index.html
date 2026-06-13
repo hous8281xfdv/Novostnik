@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Лента — новостной канал в стиле VK</title>
+    <title>Лента — новостной канал</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,10 +13,24 @@
 
     <div id="toast" class="toast"></div>
 
+    <!-- Бургер-меню -->
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-line line1"></div>
+        <div class="burger-line line2"></div>
+        <div class="burger-line line3"></div>
+    </div>
+    <nav class="mobile-nav" id="mobileNav">
+        <ul>
+            <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
+            <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
+            <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
+        </ul>
+    </nav>
+
     <header class="header">
         <div class="container">
             <div class="logo">
-                <i class="fab fa-vk"></i>
+                <i class="fas fa-newspaper"></i>
                 <span>Лента</span>
             </div>
             <div class="header-actions">
@@ -27,40 +41,33 @@
                     <span id="userName"></span>
                     <button id="logoutBtn" class="logout-small"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
+                <button id="adminPanelBtn" class="admin-panel-btn"><i class="fas fa-user-shield"></i></button>
             </div>
         </div>
     </header>
 
     <main>
-        <div class="container main-grid">
-            <aside class="sidebar">
-                <div class="menu-card">
-                    <div class="menu-item active" id="menuFeed"><i class="fas fa-newspaper"></i> Лента</div>
-                    <div class="menu-item" id="menuAdmin"><i class="fas fa-user-shield"></i> Админ</div>
-                </div>
-            </aside>
-            <div class="content">
-                <div id="feedBlock">
-                    <div class="create-post-card" id="createPostCard" style="display: none;">
-                        <div class="create-post-header">
-                            <img id="adminAvatar" src="" alt="">
-                            <div class="create-post-input" id="openEditorBtn">Что у вас нового?</div>
-                        </div>
+        <div class="container">
+            <div id="feedBlock">
+                <div class="create-post-card" id="createPostCard" style="display: none;">
+                    <div class="create-post-header">
+                        <img id="adminAvatar" src="" alt="">
+                        <div class="create-post-input" id="openEditorBtn">Что у вас нового?</div>
                     </div>
-                    <div id="postsFeed" class="posts-feed"></div>
                 </div>
-                <div id="adminBlock" class="admin-block" style="display: none;">
-                    <div class="admin-header">
-                        <h2>Управление постами</h2>
-                        <button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button>
-                    </div>
-                    <div id="adminPostsList"></div>
+                <div id="postsFeed" class="posts-feed"></div>
+            </div>
+            <div id="adminBlock" class="admin-block" style="display: none;">
+                <div class="admin-header">
+                    <h2>Управление постами</h2>
+                    <button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button>
                 </div>
+                <div id="adminPostsList"></div>
             </div>
         </div>
     </main>
 
-    <!-- Модалка создания/редактирования поста -->
+    <!-- Модалка поста -->
     <div id="postModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -69,7 +76,7 @@
                 <input type="text" id="postTitle" placeholder="Заголовок" required>
                 <textarea id="postContent" rows="4" placeholder="Что произошло?" required></textarea>
                 <div class="image-upload-area">
-                    <input type="text" id="postImageUrl" placeholder="Ссылка на картинку (необязательно)">
+                    <input type="text" id="postImageUrl" placeholder="Ссылка на картинку">
                     <div class="or-divider">или</div>
                     <input type="file" id="postImageFile" accept="image/*">
                     <div id="imagePreview" class="image-preview"></div>
@@ -95,7 +102,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>© 2026 Новостной канал — стиль VK</p>
+            <p>© 2026 Новостной канал</p>
         </div>
     </footer>
 
