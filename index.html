@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -23,7 +22,7 @@
         <ul>
             <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
             <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
-            <li><a href="#" id="mobileLoginLink"><i class="fas fa-sign-in-alt"></i> Вход</a></li>
+            <li><a href="#" id="mobileLoginLink"><i class="fas fa-sign-in-alt"></i> Вход / Регистрация</a></li>
             <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
         </ul>
     </nav>
@@ -34,7 +33,7 @@
             <div class="header-actions">
                 <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
                 <div class="user-profile" id="userProfile" style="display: none;">
-                    <img id="userAvatar" src="" alt=""><span id="userName"></span>
+                    <i class="fas fa-user-circle"></i><span id="userName"></span>
                     <button id="logoutBtn" class="logout-small"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
                 <button id="adminPanelBtn" class="admin-panel-btn"><i class="fas fa-user-shield"></i></button>
@@ -47,7 +46,7 @@
             <div id="feedBlock">
                 <div class="create-post-card" id="createPostCard" style="display: none;">
                     <div class="create-post-header">
-                        <img id="adminAvatar" src="" alt="">
+                        <div class="admin-avatar-placeholder"><i class="fas fa-user-shield"></i></div>
                         <div class="create-post-input" id="openEditorBtn">Что у вас нового?</div>
                     </div>
                 </div>
@@ -60,13 +59,19 @@
         </div>
     </main>
 
-    <!-- Модалка входа -->
+    <!-- Модалка входа / регистрации -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-login">&times;</span>
-            <h2><i class="fab fa-google"></i> Вход через Google</h2>
-            <p>Для лайков, комментариев и создания постов необходимо войти в аккаунт.</p>
-            <div id="google-login-modal" class="google-login-center"></div>
+            <h2><i class="fas fa-user-plus"></i> Вход / Регистрация</h2>
+            <form id="loginForm">
+                <label>Номер телефона</label>
+                <input type="tel" id="loginPhone" placeholder="+7 999 123 45 67" required>
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="Придумайте пароль" required>
+                <button type="submit" class="btn-submit">Войти / Зарегистрироваться</button>
+            </form>
+            <p class="modal-note">Если аккаунта нет — он будет создан автоматически.</p>
         </div>
     </div>
 
