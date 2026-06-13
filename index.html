@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Лента — новостной канал</title>
+    <title>Новостник — Новости Новороссийска</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,14 +22,14 @@
         <ul>
             <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
             <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
-            <li><a href="#" id="mobileLoginLink"><i class="fas fa-sign-in-alt"></i> Вход / Регистрация</a></li>
+            <li><a href="#" id="mobileLogoutLink"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
             <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
         </ul>
     </nav>
 
     <header class="header">
         <div class="container">
-            <div class="logo"><i class="fas fa-newspaper"></i><span>Лента</span></div>
+            <div class="logo"><i class="fas fa-newspaper"></i><span>Новостник</span></div>
             <div class="header-actions">
                 <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
                 <div class="user-profile" id="userProfile" style="display: none;">
@@ -43,7 +43,22 @@
 
     <main>
         <div class="container">
-            <div id="feedBlock">
+            <!-- Главный экран (приветствие) -->
+            <div id="welcomeBlock" class="welcome-block">
+                <div class="welcome-card">
+                    <i class="fas fa-newspaper"></i>
+                    <h1>Новостник</h1>
+                    <p>Новости Новороссийска и Краснодарского края</p>
+                    <div class="welcome-buttons">
+                        <button id="welcomeLoginBtn" class="btn-primary">Войти</button>
+                        <button id="welcomeRegisterBtn" class="btn-secondary">Регистрация</button>
+                    </div>
+                    <p class="support-link">Если нашли ошибку — напишите в поддержку: <a href="mailto:support@novostnik.ru">support@novostnik.ru</a></p>
+                </div>
+            </div>
+
+            <!-- Лента -->
+            <div id="feedBlock" style="display: none;">
                 <div class="create-post-card" id="createPostCard" style="display: none;">
                     <div class="create-post-header">
                         <div class="admin-avatar-placeholder"><i class="fas fa-user-shield"></i></div>
@@ -52,6 +67,8 @@
                 </div>
                 <div id="postsFeed" class="posts-feed"></div>
             </div>
+
+            <!-- Админка -->
             <div id="adminBlock" class="admin-block" style="display: none;">
                 <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
                 <div id="adminPostsList"></div>
@@ -59,19 +76,39 @@
         </div>
     </main>
 
-    <!-- Модалка входа / регистрации -->
+    <!-- Модалка входа -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-login">&times;</span>
-            <h2><i class="fas fa-user-plus"></i> Вход / Регистрация</h2>
+            <h2><i class="fas fa-sign-in-alt"></i> Вход</h2>
             <form id="loginForm">
                 <label>Номер телефона</label>
                 <input type="tel" id="loginPhone" placeholder="+7 999 123 45 67" required>
                 <label>Пароль</label>
-                <input type="password" id="loginPassword" placeholder="Придумайте пароль" required>
-                <button type="submit" class="btn-submit">Войти / Зарегистрироваться</button>
+                <input type="password" id="loginPassword" placeholder="Пароль" required>
+                <button type="submit" class="btn-submit">Войти</button>
             </form>
-            <p class="modal-note">Если аккаунта нет — он будет создан автоматически.</p>
+            <p class="modal-note">Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
+        </div>
+    </div>
+
+    <!-- Модалка регистрации -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-register">&times;</span>
+            <h2><i class="fas fa-user-plus"></i> Регистрация</h2>
+            <form id="registerForm">
+                <label>Имя</label>
+                <input type="text" id="regFirstName" placeholder="Иван" required>
+                <label>Фамилия</label>
+                <input type="text" id="regLastName" placeholder="Иванов" required>
+                <label>Номер телефона</label>
+                <input type="tel" id="regPhone" placeholder="+7 999 123 45 67" required>
+                <label>Пароль</label>
+                <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
+                <button type="submit" class="btn-submit">Зарегистрироваться</button>
+            </form>
+            <p class="modal-note">Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
         </div>
     </div>
 
@@ -82,7 +119,7 @@
             <h2 id="modalTitle">Создать пост</h2>
             <form id="postForm">
                 <input type="text" id="postTitle" placeholder="Заголовок" required>
-                <textarea id="postContent" rows="4" placeholder="Что произошло?" required></textarea>
+                <textarea id="postContent" rows="4" placeholder="Текст новости" required></textarea>
                 <input type="text" id="postImageUrl" placeholder="Ссылка на картинку">
                 <div class="or-divider">или</div>
                 <input type="file" id="postImageFile" accept="image/*">
@@ -104,7 +141,7 @@
         </div>
     </div>
 
-    <footer class="footer"><div class="container"><p>© 2026 Новостной канал</p></div></footer>
+    <footer class="footer"><div class="container"><p>© 2026 Новостник — Новости Новороссийска и Краснодарского края</p></div></footer>
     <script src="script.js"></script>
 </body>
 </html>
