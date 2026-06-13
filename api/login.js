@@ -11,9 +11,9 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Телефон и пароль обязательны' });
     }
 
-    const sql = neon(process.env.DATABASE_URL);
-
     try {
+        const sql = neon(process.env.DATABASE_URL);
+        
         const [user] = await sql`
             SELECT id, name, phone FROM users 
             WHERE phone = ${phone} AND password = ${password}
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
         res.status(200).json(user);
     } catch (error) {
-        console.error('Ошибка входа:', error);
-        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+        console.error('Ошибка:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
     }
 }
