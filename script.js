@@ -1,44 +1,59 @@
 // === НАСТРОЙКИ ===
 const ADMIN_PASSWORD = 'admin123';
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-
 let posts = [];
+let users = [];
 let currentUser = null;
 let currentCommentPostId = null;
 let isAdminMode = false;
 
-// === GOOGLE LOGIN ===
-function initGoogleLogin() {
-    if (typeof google !== 'undefined') {
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleGoogleCredentialResponse,
-        });
-        google.accounts.id.renderButton(document.getElementById('google-login-modal'), { theme: 'outline', size: 'large' });
-    }
-}
-
-function handleGoogleCredentialResponse(response) {
-    const payload = JSON.parse(atob(response.credential.split('.')[1]));
-    currentUser = {
-        name: payload.name,
-        email: payload.email,
-        avatar: payload.picture,
-        sub: payload.sub
-    };
-    localStorage.setItem('blogUser', JSON.stringify(currentUser));
+// === ЗАГРУЗКА ДАННЫХ ===
+function loadData() {
+    const savedPosts = localStorage.getItem('blogPostsV4');
+    posts = savedPosts ? JSON.parse(savedPosts) : [];
+    const savedUsers = localStorage.getItem('blogUsers');
+    users = savedUsers ? JSON.parse(savedUsers) : [];
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) currentUser = JSON.parse(savedUser);
     updateUI();
-    closeModal(document.getElementById('loginModal'));
-    showToast(`Добро пожаловать, ${currentUser.name}!`);
 }
 
-function showLoginModal() {
-    document.getElementById('loginModal').style.display = 'block';
+function savePosts() { localStorage.setItem('blogPostsV4', JSON.stringify(posts)); }
+function saveUsers() { localStorage.setItem('blogUsers', JSON.stringify(users)); }
+function saveCurrentUser() {
+    if (currentUser) localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    else localStorage.removeItem('currentUser');
+}
+
+// === РЕГИСТРАЦИЯ / ВХОД ===
+function loginOrRegister(phone, password) {
+    const existingUser = users.find(u => u.phone === phone);
+    if (existingUser) {
+        if (existingUser.password === password) {
+            currentUser = { phone: existingUser.phone, name: existingUser.name };
+            saveCurrentUser();
+            updateUI();
+            showToast(`Добро пожаловать, ${existingUser.name}!`);
+            return true;
+        } else {
+            showToast('Неверный пароль', true);
+            return false;
+        }
+    } else {
+        const newName = phone.slice(-6);
+        const newUser = { phone: phone, password: password, name: newName };
+        users.push(newUser);
+        saveUsers();
+        currentUser = { phone: newUser.phone, name: newUser.name };
+        saveCurrentUser();
+        updateUI();
+        showToast(`Аккаунт создан! Добро пожаловать, ${newUser.name}`);
+        return true;
+    }
 }
 
 function logout() {
     currentUser = null;
-    localStorage.removeItem('blogUser');
+    saveCurrentUser();
     updateUI();
     renderPosts();
     showToast('Вы вышли из аккаунта');
@@ -49,9 +64,7 @@ function updateUI() {
     const createCard = document.getElementById('createPostCard');
     if (currentUser) {
         profile.style.display = 'flex';
-        document.getElementById('userAvatar').src = currentUser.avatar;
         document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('adminAvatar').src = currentUser.avatar;
         if (createCard) createCard.style.display = 'flex';
     } else {
         profile.style.display = 'none';
@@ -59,19 +72,7 @@ function updateUI() {
     }
 }
 
-// === РАБОТА С ПОСТАМИ ===
-function loadData() {
-    const saved = localStorage.getItem('blogPostsV3');
-    posts = saved ? JSON.parse(saved) : [];
-    const savedUser = localStorage.getItem('blogUser');
-    if (savedUser) currentUser = JSON.parse(savedUser);
-    updateUI();
-}
-
-function savePosts() {
-    localStorage.setItem('blogPostsV3', JSON.stringify(posts));
-}
-
+// === ПОСТЫ ===
 function renderPosts() {
     const container = document.getElementById('postsFeed');
     if (!container) return;
@@ -90,7 +91,7 @@ function renderPosts() {
             <div class="post-content">${escapeHtml(post.content).replace(/\n/g, '<br>')}</div>
             ${post.imageUrl ? `<div class="post-image"><img src="${escapeHtml(post.imageUrl)}" alt="post"></div>` : ''}
             <div class="post-stats">
-                <button class="like-btn ${post.likes && post.likes.includes(currentUser?.sub) ? 'liked' : ''}" data-id="${post.id}"><i class="fas fa-heart"></i> ${post.likes ? post.likes.length : 0}</button>
+                <button class="like-btn ${post.likes && post.likes.includes(currentUser?.phone) ? 'liked' : ''}" data-id="${post.id}"><i class="fas fa-heart"></i> ${post.likes ? post.likes.length : 0}</button>
                 <button class="comment-btn" data-id="${post.id}"><i class="fas fa-comment"></i> ${post.comments ? post.comments.length : 0}</button>
             </div>
             ${isAdminMode ? `<div class="admin-buttons"><button class="edit-post" data-id="${post.id}">✏️ Редактировать</button><button class="delete-post" data-id="${post.id}">🗑️ Удалить</button></div>` : ''}
@@ -127,8 +128,8 @@ function toggleLike(postId) {
     const post = posts.find(p => p.id == postId);
     if (!post) return;
     if (!post.likes) post.likes = [];
-    const idx = post.likes.indexOf(currentUser.sub);
-    if (idx === -1) post.likes.push(currentUser.sub);
+    const idx = post.likes.indexOf(currentUser.phone);
+    if (idx === -1) post.likes.push(currentUser.phone);
     else post.likes.splice(idx, 1);
     savePosts();
     renderPosts();
@@ -181,7 +182,6 @@ function renderAdminPosts() {
 }
 
 function openPostEditor(id = null) {
-    if (!currentUser) { showLoginModal(); return; }
     const modal = document.getElementById('postModal');
     document.getElementById('postForm').reset();
     document.getElementById('editPostId').value = '';
@@ -290,15 +290,18 @@ document.getElementById('mobileLoginLink').addEventListener('click', (e) => {
     showLoginModal();
 });
 
-document.getElementById('openEditorBtn').addEventListener('click', () => {
-    if (!currentUser) { showLoginModal(); return; }
-    openPostEditor();
-});
-document.getElementById('addPostBtn').addEventListener('click', () => {
-    if (!currentUser) { showLoginModal(); return; }
-    openPostEditor();
-});
+document.getElementById('openEditorBtn').addEventListener('click', () => openPostEditor());
+document.getElementById('addPostBtn').addEventListener('click', () => openPostEditor());
 document.getElementById('logoutBtn').addEventListener('click', logout);
+
+function showLoginModal() { document.getElementById('loginModal').style.display = 'block'; }
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const phone = document.getElementById('loginPhone').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    if (!phone || !password) { showToast('Заполните телефон и пароль', true); return; }
+    if (loginOrRegister(phone, password)) closeModal(document.getElementById('loginModal'));
+});
 
 // Тёмная тема
 document.getElementById('themeToggle').addEventListener('click', () => {
@@ -322,7 +325,6 @@ if (burger && mobileNav) {
     });
 }
 
-// Закрытие модалок
 function closeModal(modal) { if (modal) modal.style.display = 'none'; }
 document.querySelectorAll('.close, .close-comments, .close-login').forEach(btn => {
     btn.onclick = () => {
@@ -342,9 +344,7 @@ function showToast(msg, isErr = false) {
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
 }
-
 function escapeHtml(str) { return str ? str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;') : ''; }
 
 loadData();
 renderPosts();
-initGoogleLogin();
