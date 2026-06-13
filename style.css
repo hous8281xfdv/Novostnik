@@ -37,7 +37,6 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
-/* Бургер */
 .burger-menu {
     display: none;
     position: fixed;
@@ -94,7 +93,6 @@ body {
     .header .container { padding-left: 50px; }
 }
 
-/* Header */
 .header {
     background: white;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
@@ -144,7 +142,6 @@ body {
     cursor: pointer;
 }
 
-/* Главный экран */
 .welcome-block {
     display: flex;
     justify-content: center;
@@ -185,7 +182,6 @@ body {
 .support-link { font-size: 0.8rem; color: #999; }
 .support-link a { color: #ff7e33; text-decoration: none; }
 
-/* Посты */
 .post-card {
     background: white;
     border-radius: 16px;
@@ -248,7 +244,6 @@ body {
 .edit-post { background: #edeef0; color: #2d4a2d; }
 .delete-post { background: #edeef0; color: #c0392b; }
 
-/* Админка */
 .admin-block { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; }
 .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #edeef0; padding-bottom: 10px; }
 .admin-tab { background: none; border: none; padding: 8px 16px; cursor: pointer; border-radius: 20px; font-weight: 500; }
@@ -317,7 +312,6 @@ body {
     color: #818c99;
 }
 
-/* Модалки */
 .modal {
     display: none;
     position: fixed;
@@ -379,7 +373,6 @@ form input, form textarea {
 .modal-note { font-size: 0.8rem; text-align: center; margin-top: 15px; }
 .modal-note a { color: #ff7e33; text-decoration: none; cursor: pointer; }
 
-/* Тёмная тема */
 body.dark-theme { background: #121212; color: #e0e0e0; }
 body.dark-theme .header, body.dark-theme .post-card, body.dark-theme .admin-block, body.dark-theme .modal-content, body.dark-theme .create-post-card, body.dark-theme .mobile-nav, body.dark-theme .welcome-card { background: #1e1e1e; color: #e0e0e0; }
 body.dark-theme .admin-post-item, body.dark-theme .comment-item, body.dark-theme .moderation-item { background: #2a2a2a; }
