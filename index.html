@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Новостной канал — Блог с комментариями и лайками</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Identity Services для входа через Google -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-line line1"></div>
+        <div class="burger-line line2"></div>
+        <div class="burger-line line3"></div>
+    </div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="mobile-user-photo">
+                <img src="https://placehold.co/80x80?text=👤" alt="User">
+            </div>
+            <p class="mobile-welcome">Меню</p>
+        </div>
+        <ul>
+            <li><a href="#" class="mobile-link" id="homeLink"><i class="fas fa-newspaper"></i> Лента</a></li>
+            <li><a href="#" id="mobileAdminLink" class="admin-link"><i class="fas fa-user-shield"></i> Админ</a></li>
+            <li><button id="themeToggleMobile" class="theme-btn"><i class="fas fa-moon"></i> Тёмная тема</button></li>
+        </ul>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Новостной канал</h1>
+                <p>Блог с комментариями и лайками</p>
+            </div>
+            <div class="header-actions">
+                <div id="google-login" class="google-login"></div>
+                <div class="user-profile" id="userProfile" style="display:none;">
+                    <img id="userAvatar" src="" alt="Avatar">
+                    <span id="userName"></span>
+                    <button id="logoutBtn" class="logout-small">Выйти</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="posts-feed" id="postsFeed"></div>
+        </div>
+    </main>
+
+    <!-- Модалка админки (добавление/редактирование поста) -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close-admin">&times;</span>
+            <h2><i class="fas fa-lock"></i> Админ панель</h2>
+            <form id="adminLoginForm">
+                <label>Пароль</label>
+                <input type="password" id="adminPassword" placeholder="Введите пароль">
+                <button type="submit" class="btn-submit">Войти</button>
+            </form>
+            <div id="adminContent" style="display:none;">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="postsTab">📝 Управление постами</button>
+                    <button class="admin-tab" data-tab="commentsTab">💬 Комментарии (все)</button>
+                </div>
+                <div id="postsTab" class="admin-tab-content active">
+                    <h3>Список постов</h3>
+                    <div id="adminPostsList"></div>
+                    <button id="addPostBtn" class="btn-add-post">+ Создать новый пост</button>
+                </div>
+                <div id="commentsTab" class="admin-tab-content">
+                    <h3>Все комментарии пользователей</h3>
+                    <div id="allCommentsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка создания/редактирования поста -->
+    <div id="postEditorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-editor">&times;</span>
+            <h2 id="editorTitle">Создать пост</h2>
+            <form id="postForm">
+                <label>Заголовок</label>
+                <input type="text" id="postTitle" required>
+                <label>Текст новости</label>
+                <textarea id="postContent" rows="5" required></textarea>
+                <label>Ссылка на картинку (URL) или загрузите файл</label>
+                <input type="text" id="postImageUrl" placeholder="https://example.com/photo.jpg">
+                <input type="file" id="postImageFile" accept="image/*">
+                <div id="imagePreview" class="image-preview"></div>
+                <input type="hidden" id="editPostId" value="">
+                <button type="submit" class="btn-submit">Сохранить пост</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка комментариев к посту -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-comments">&times;</span>
+            <h2>💬 Комментарии</h2>
+            <div id="commentsList"></div>
+            <div id="addCommentBlock" class="add-comment-block">
+                <textarea id="newCommentText" rows="2" placeholder="Ваш комментарий..."></textarea>
+                <button id="submitCommentBtn" class="btn-submit">Отправить комментарий</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-trigger" id="adminTrigger">
+        <i class="fas fa-user-shield"></i>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Новостной канал — блог с комментариями</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
