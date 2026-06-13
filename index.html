@@ -22,6 +22,7 @@
         <ul>
             <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
             <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
+            <li><a href="#" id="mobileProposeLink"><i class="fas fa-plus-circle"></i> Предложить пост</a></li>
             <li><a href="#" id="mobileLogoutLink"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
             <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
         </ul>
@@ -43,7 +44,7 @@
 
     <main>
         <div class="container">
-            <!-- Главный экран (приветствие) -->
+            <!-- Главный экран -->
             <div id="welcomeBlock" class="welcome-block">
                 <div class="welcome-card">
                     <i class="fas fa-newspaper"></i>
@@ -61,8 +62,8 @@
             <div id="feedBlock" style="display: none;">
                 <div class="create-post-card" id="createPostCard" style="display: none;">
                     <div class="create-post-header">
-                        <div class="admin-avatar-placeholder"><i class="fas fa-user-shield"></i></div>
-                        <div class="create-post-input" id="openEditorBtn">Что у вас нового?</div>
+                        <div class="admin-avatar-placeholder"><i class="fas fa-user"></i></div>
+                        <div class="create-post-input" id="openProposeBtn">Предложить новость</div>
                     </div>
                 </div>
                 <div id="postsFeed" class="posts-feed"></div>
@@ -70,8 +71,18 @@
 
             <!-- Админка -->
             <div id="adminBlock" class="admin-block" style="display: none;">
-                <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
-                <div id="adminPostsList"></div>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="postsTab">📝 Посты</button>
+                    <button class="admin-tab" data-tab="moderationTab">⏳ Модерация</button>
+                </div>
+                <div id="postsTab" class="admin-tab-content active">
+                    <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
+                    <div id="adminPostsList"></div>
+                </div>
+                <div id="moderationTab" class="admin-tab-content">
+                    <h2>Предложенные посты (на модерации)</h2>
+                    <div id="moderationList"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -112,7 +123,25 @@
         </div>
     </div>
 
-    <!-- Модалка поста -->
+    <!-- Модалка предложения поста -->
+    <div id="proposeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-propose">&times;</span>
+            <h2><i class="fas fa-plus-circle"></i> Предложить новость</h2>
+            <form id="proposeForm">
+                <input type="text" id="proposeTitle" placeholder="Заголовок" required>
+                <textarea id="proposeContent" rows="4" placeholder="Текст новости" required></textarea>
+                <input type="text" id="proposeImageUrl" placeholder="Ссылка на картинку (необязательно)">
+                <div class="or-divider">или</div>
+                <input type="file" id="proposeImageFile" accept="image/*">
+                <div id="proposeImagePreview" class="image-preview"></div>
+                <button type="submit" class="btn-submit">Отправить на модерацию</button>
+            </form>
+            <p class="modal-note">Пост уйдёт на проверку админу. После одобрения появится в ленте.</p>
+        </div>
+    </div>
+
+    <!-- Модалка поста (админ) -->
     <div id="postModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
