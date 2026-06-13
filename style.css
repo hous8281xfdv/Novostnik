@@ -37,6 +37,7 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
+/* Бургер */
 .burger-menu {
     display: none;
     position: fixed;
@@ -93,6 +94,7 @@ body {
     .header .container { padding-left: 50px; }
 }
 
+/* Header */
 .header {
     background: white;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
@@ -110,7 +112,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #ff7e33;
 }
@@ -142,6 +144,69 @@ body {
     cursor: pointer;
 }
 
+/* Главный экран */
+.welcome-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+.welcome-card {
+    background: white;
+    border-radius: 32px;
+    padding: 50px 40px;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.welcome-card i {
+    font-size: 4rem;
+    color: #ff7e33;
+    margin-bottom: 20px;
+}
+.welcome-card h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+.welcome-card p {
+    color: #666;
+    margin-bottom: 30px;
+}
+.welcome-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+.btn-primary {
+    background: #ff7e33;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-secondary {
+    background: none;
+    border: 1px solid #ff7e33;
+    color: #ff7e33;
+    padding: 12px 30px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.support-link {
+    font-size: 0.8rem;
+    color: #999;
+}
+.support-link a {
+    color: #ff7e33;
+    text-decoration: none;
+}
+
+/* Посты (как VK) */
 .post-card {
     background: white;
     border-radius: 16px;
@@ -186,8 +251,9 @@ body {
     align-items: center;
     gap: 6px;
     color: #818c99;
+    font-size: 0.9rem;
 }
-.like-btn.liked { color: #ff7e33; }
+.like-btn.liked { color: #ff4d4d; }
 .admin-buttons {
     padding: 0 16px 16px;
     display: flex;
@@ -203,6 +269,7 @@ body {
 .edit-post { background: #edeef0; color: #2d4a2d; }
 .delete-post { background: #edeef0; color: #c0392b; }
 
+/* Админка */
 .admin-block { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; }
 .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
 .add-post-btn {
@@ -224,6 +291,16 @@ body {
     flex-wrap: wrap;
     gap: 10px;
 }
+.admin-post-item button {
+    background: none;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.admin-post-item button:first-child { background: #ff7e33; color: white; }
+.admin-post-item button:last-child { background: #c0392b; color: white; }
+
 .create-post-card {
     background: white;
     border-radius: 16px;
@@ -254,6 +331,7 @@ body {
     color: #818c99;
 }
 
+/* Модалки */
 .modal {
     display: none;
     position: fixed;
@@ -269,13 +347,13 @@ body {
     background: white;
     margin: 50px auto;
     width: 90%;
-    max-width: 550px;
+    max-width: 500px;
     border-radius: 24px;
     padding: 24px;
     max-height: 85vh;
     overflow-y: auto;
 }
-.close, .close-comments, .close-login {
+.close, .close-comments, .close-login, .close-register {
     float: right;
     font-size: 28px;
     cursor: pointer;
@@ -295,10 +373,11 @@ form input, form textarea {
     background: #ff7e33;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px;
     border-radius: 40px;
     cursor: pointer;
     width: 100%;
+    font-weight: 600;
 }
 .image-preview img { max-width: 100%; border-radius: 16px; margin-top: 8px; }
 .comment-item {
@@ -307,13 +386,19 @@ form input, form textarea {
     border-radius: 20px;
     margin-bottom: 12px;
 }
-.comments-list { margin-bottom: 20px; }
-#newCommentText { width: 100%; border-radius: 20px; background: #f5f6f8; border: none; padding: 12px; margin-bottom: 10px; }
-.modal-note { font-size: 0.7rem; text-align: center; margin-top: 12px; color: #818c99; }
+.comment-author { font-weight: 600; font-size: 0.9rem; }
+.comment-text { margin-top: 4px; font-size: 0.9rem; }
+.comments-list { max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
+#newCommentText { width: 100%; border-radius: 20px; background: #f5f6f8; border: none; padding: 12px; margin-bottom: 10px; resize: vertical; }
+.modal-note { font-size: 0.8rem; text-align: center; margin-top: 15px; }
+.modal-note a { color: #ff7e33; text-decoration: none; cursor: pointer; }
 
+/* Тёмная тема */
 body.dark-theme { background: #121212; color: #e0e0e0; }
-body.dark-theme .header, body.dark-theme .post-card, body.dark-theme .admin-block, body.dark-theme .modal-content, body.dark-theme .create-post-card, body.dark-theme .mobile-nav { background: #1e1e1e; color: #e0e0e0; }
+body.dark-theme .header, body.dark-theme .post-card, body.dark-theme .admin-block, body.dark-theme .modal-content, body.dark-theme .create-post-card, body.dark-theme .mobile-nav, body.dark-theme .welcome-card { background: #1e1e1e; color: #e0e0e0; }
 body.dark-theme .admin-post-item, body.dark-theme .comment-item { background: #2a2a2a; }
 body.dark-theme .create-post-input { background: #2a2a2a; color: #aaa; }
 body.dark-theme .post-stats { border-color: #2a2a2a; }
-.footer { text-align: center; padding: 30px; margin-top: 40px; color: #818c99; }
+body.dark-theme .welcome-card p { color: #aaa; }
+
+.footer { text-align: center; padding: 30px; margin-top: 40px; color: #818c99; font-size: 0.8rem; }
