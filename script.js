@@ -1,388 +1,147 @@
-// === НАСТРОЙКИ ===
-const ADMIN_PASSWORD = 'admin123';
-let posts = [];
-let users = [];
-let currentUser = null;
-let currentCommentPostId = null;
-let isAdminMode = false;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Новостник — Новости Новороссийска</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
 
-// === ЗАГРУЗКА ДАННЫХ ===
-function loadData() {
-    const savedPosts = localStorage.getItem('blogPostsV4');
-    posts = savedPosts ? JSON.parse(savedPosts) : [];
-    const savedUsers = localStorage.getItem('blogUsers');
-    users = savedUsers ? JSON.parse(savedUsers) : [];
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) currentUser = JSON.parse(savedUser);
-    updateUI();
-}
+    <div id="toast" class="toast"></div>
 
-function savePosts() { localStorage.setItem('blogPostsV4', JSON.stringify(posts)); }
-function saveUsers() { localStorage.setItem('blogUsers', JSON.stringify(users)); }
-function saveCurrentUser() {
-    if (currentUser) localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    else localStorage.removeItem('currentUser');
-}
+    <!-- Бургер-меню -->
+    <div class="burger-menu" id="burgerMenu">
+        <div class="burger-line line1"></div>
+        <div class="burger-line line2"></div>
+        <div class="burger-line line3"></div>
+    </div>
+    <nav class="mobile-nav" id="mobileNav">
+        <ul>
+            <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
+            <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
+            <li><a href="#" id="mobileLogoutLink"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
+            <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
+        </ul>
+    </nav>
 
-// === РЕГИСТРАЦИЯ / ВХОД ===
-function loginOrRegister(phone, password) {
-    const existingUser = users.find(u => u.phone === phone);
-    if (existingUser) {
-        if (existingUser.password === password) {
-            currentUser = { phone: existingUser.phone, name: existingUser.name };
-            saveCurrentUser();
-            updateUI();
-            showToast(`Добро пожаловать, ${existingUser.name}!`);
-            return true;
-        } else {
-            showToast('Неверный пароль', true);
-            return false;
-        }
-    } else {
-        const newName = phone.slice(-6);
-        const newUser = { phone: phone, password: password, name: newName };
-        users.push(newUser);
-        saveUsers();
-        currentUser = { phone: newUser.phone, name: newUser.name };
-        saveCurrentUser();
-        updateUI();
-        showToast(`Аккаунт создан! Добро пожаловать, ${newUser.name}`);
-        return true;
-    }
-}
-
-function logout() {
-    currentUser = null;
-    saveCurrentUser();
-    updateUI();
-    renderPosts();
-    showToast('Вы вышли из аккаунта');
-}
-
-function updateUI() {
-    const profile = document.getElementById('userProfile');
-    const createCard = document.getElementById('createPostCard');
-    if (currentUser) {
-        profile.style.display = 'flex';
-        document.getElementById('userName').innerText = currentUser.name;
-        if (createCard) createCard.style.display = 'flex';
-    } else {
-        profile.style.display = 'none';
-        if (createCard) createCard.style.display = 'none';
-    }
-}
-
-// === ПОСТЫ ===
-function renderPosts() {
-    const container = document.getElementById('postsFeed');
-    if (!container) return;
-    if (posts.length === 0) {
-        container.innerHTML = '<div class="post-card" style="padding:20px; text-align:center;">Нет постов. Создайте первый ✨</div>';
-        return;
-    }
-    const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
-    container.innerHTML = sorted.map(post => `
-        <div class="post-card">
-            <div class="post-header">
-                <div class="post-avatar"><i class="fas fa-user-edit"></i></div>
-                <div class="post-author-info"><h3>Админ канала</h3><div class="post-date">${new Date(post.date).toLocaleString('ru-RU')}</div></div>
+    <header class="header">
+        <div class="container">
+            <div class="logo"><i class="fas fa-newspaper"></i><span>Новостник</span></div>
+            <div class="header-actions">
+                <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
+                <div class="user-profile" id="userProfile" style="display: none;">
+                    <i class="fas fa-user-circle"></i><span id="userName"></span>
+                    <button id="logoutBtn" class="logout-small"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+                <button id="adminPanelBtn" class="admin-panel-btn"><i class="fas fa-user-shield"></i></button>
             </div>
-            <div class="post-title"><strong>${escapeHtml(post.title)}</strong></div>
-            <div class="post-content">${escapeHtml(post.content).replace(/\n/g, '<br>')}</div>
-            ${post.imageUrl ? `<div class="post-image"><img src="${escapeHtml(post.imageUrl)}" alt="post"></div>` : ''}
-            <div class="post-stats">
-                <button class="like-btn ${post.likes && post.likes.includes(currentUser?.phone) ? 'liked' : ''}" data-id="${post.id}"><i class="fas fa-heart"></i> ${post.likes ? post.likes.length : 0}</button>
-                <button class="comment-btn" data-id="${post.id}"><i class="fas fa-comment"></i> ${post.comments ? post.comments.length : 0}</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Главный экран (приветствие) -->
+            <div id="welcomeBlock" class="welcome-block">
+                <div class="welcome-card">
+                    <i class="fas fa-newspaper"></i>
+                    <h1>Новостник</h1>
+                    <p>Новости Новороссийска и Краснодарского края</p>
+                    <div class="welcome-buttons">
+                        <button id="welcomeLoginBtn" class="btn-primary">Войти</button>
+                        <button id="welcomeRegisterBtn" class="btn-secondary">Регистрация</button>
+                    </div>
+                    <p class="support-link">Если нашли ошибку — напишите в поддержку: <a href="mailto:support@novostnik.ru">support@novostnik.ru</a></p>
+                </div>
             </div>
-            ${isAdminMode ? `<div class="admin-buttons"><button class="edit-post" data-id="${post.id}">✏️ Редактировать</button><button class="delete-post" data-id="${post.id}">🗑️ Удалить</button></div>` : ''}
+
+            <!-- Лента -->
+            <div id="feedBlock" style="display: none;">
+                <div class="create-post-card" id="createPostCard" style="display: none;">
+                    <div class="create-post-header">
+                        <div class="admin-avatar-placeholder"><i class="fas fa-user-shield"></i></div>
+                        <div class="create-post-input" id="openEditorBtn">Что у вас нового?</div>
+                    </div>
+                </div>
+                <div id="postsFeed" class="posts-feed"></div>
+            </div>
+
+            <!-- Админка -->
+            <div id="adminBlock" class="admin-block" style="display: none;">
+                <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
+                <div id="adminPostsList"></div>
+            </div>
         </div>
-    `).join('');
+    </main>
 
-    document.querySelectorAll('.like-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (!currentUser) { showLoginModal(); return; }
-            toggleLike(btn.dataset.id);
-        });
-    });
-    document.querySelectorAll('.comment-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (!currentUser) { showLoginModal(); return; }
-            openCommentsModal(btn.dataset.id);
-        });
-    });
-    if (isAdminMode) {
-        document.querySelectorAll('.edit-post').forEach(btn => btn.addEventListener('click', () => openPostEditor(btn.dataset.id)));
-        document.querySelectorAll('.delete-post').forEach(btn => btn.addEventListener('click', () => {
-            if (confirm('Удалить пост?')) {
-                posts = posts.filter(p => p.id != btn.dataset.id);
-                savePosts();
-                renderPosts();
-                renderAdminPosts();
-                showToast('Пост удалён');
-            }
-        }));
-    }
-}
-
-function toggleLike(postId) {
-    const post = posts.find(p => p.id == postId);
-    if (!post) return;
-    if (!post.likes) post.likes = [];
-    const idx = post.likes.indexOf(currentUser.phone);
-    if (idx === -1) post.likes.push(currentUser.phone);
-    else post.likes.splice(idx, 1);
-    savePosts();
-    renderPosts();
-}
-
-function addComment(postId, text) {
-    if (!currentUser) { showLoginModal(); return false; }
-    if (!text.trim()) return false;
-    const post = posts.find(p => p.id == postId);
-    if (!post) return false;
-    if (!post.comments) post.comments = [];
-    post.comments.push({ id: Date.now(), author: currentUser.name, text: text.trim(), date: new Date().toISOString() });
-    savePosts();
-    renderPosts();
-    return true;
-}
-
-function deleteComment(postId, commentId) {
-    const post = posts.find(p => p.id == postId);
-    if (post && post.comments) {
-        post.comments = post.comments.filter(c => c.id != commentId);
-        savePosts();
-        renderPosts();
-        showToast('Комментарий удалён');
-    }
-}
-
-// === АДМИНКА ===
-function renderAdminPosts() {
-    const container = document.getElementById('adminPostsList');
-    if (!container) return;
-    if (posts.length === 0) { container.innerHTML = '<p>Нет постов</p>'; return; }
-    const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
-    container.innerHTML = sorted.map(post => `
-        <div class="admin-post-item">
-            <div><strong>${escapeHtml(post.title)}</strong><br><small>${new Date(post.date).toLocaleDateString()}</small></div>
-            <div><button class="edit-post-admin" data-id="${post.id}">Ред.</button><button class="delete-post-admin" data-id="${post.id}">Удалить</button></div>
+    <!-- Модалка входа -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-login">&times;</span>
+            <h2><i class="fas fa-sign-in-alt"></i> Вход</h2>
+            <form id="loginForm">
+                <label>Номер телефона</label>
+                <input type="tel" id="loginPhone" placeholder="+7 999 123 45 67" required>
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="Пароль" required>
+                <button type="submit" class="btn-submit">Войти</button>
+            </form>
+            <p class="modal-note">Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
         </div>
-    `).join('');
-    document.querySelectorAll('.edit-post-admin').forEach(btn => btn.addEventListener('click', () => openPostEditor(btn.dataset.id)));
-    document.querySelectorAll('.delete-post-admin').forEach(btn => btn.addEventListener('click', () => {
-        if (confirm('Удалить пост?')) {
-            posts = posts.filter(p => p.id != btn.dataset.id);
-            savePosts();
-            renderPosts();
-            renderAdminPosts();
-            showToast('Пост удалён');
-        }
-    }));
-}
+    </div>
 
-function openPostEditor(id = null) {
-    const modal = document.getElementById('postModal');
-    document.getElementById('postForm').reset();
-    document.getElementById('editPostId').value = '';
-    document.getElementById('imagePreview').innerHTML = '';
-    document.getElementById('modalTitle').innerText = id ? 'Редактировать пост' : 'Создать пост';
-    if (id) {
-        const post = posts.find(p => p.id == id);
-        if (post) {
-            document.getElementById('postTitle').value = post.title;
-            document.getElementById('postContent').value = post.content;
-            document.getElementById('postImageUrl').value = post.imageUrl || '';
-            if (post.imageUrl) document.getElementById('imagePreview').innerHTML = `<img src="${post.imageUrl}" alt="preview">`;
-            document.getElementById('editPostId').value = id;
-        }
-    }
-    modal.style.display = 'block';
-}
-
-// === ФОРМА СОЗДАНИЯ ПОСТА (ПОЧИНЕНА) ===
-const postForm = document.getElementById('postForm');
-if (postForm) {
-    postForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        console.log('Форма отправлена'); // для проверки в консоли
-        
-        const title = document.getElementById('postTitle').value.trim();
-        const content = document.getElementById('postContent').value.trim();
-        let imageUrl = document.getElementById('postImageUrl').value.trim();
-        const file = document.getElementById('postImageFile').files[0];
-        const editId = document.getElementById('editPostId').value;
-        
-        if (!title || !content) {
-            showToast('Заголовок и текст обязательны', true);
-            return;
-        }
-        
-        const save = (url) => {
-            if (editId) {
-                const idx = posts.findIndex(p => p.id == editId);
-                if (idx !== -1) {
-                    posts[idx] = { ...posts[idx], title, content, imageUrl: url, date: new Date().toISOString() };
-                }
-            } else {
-                posts.push({
-                    id: Date.now(),
-                    title,
-                    content,
-                    imageUrl: url,
-                    date: new Date().toISOString(),
-                    likes: [],
-                    comments: []
-                });
-            }
-            savePosts();
-            renderPosts();
-            if (isAdminMode) renderAdminPosts();
-            closeModal(document.getElementById('postModal'));
-            showToast(editId ? 'Пост обновлён' : 'Пост создан');
-        };
-        
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => save(ev.target.result);
-            reader.readAsDataURL(file);
-        } else {
-            save(imageUrl);
-        }
-    });
-}
-
-// === КОММЕНТАРИИ ===
-function openCommentsModal(postId) {
-    currentCommentPostId = postId;
-    const post = posts.find(p => p.id == postId);
-    const container = document.getElementById('commentsList');
-    if (!post) return;
-    container.innerHTML = (post.comments || []).map(c => `
-        <div class="comment-item">
-            <div class="comment-author">${escapeHtml(c.author)} <span style="font-size:0.7rem; color:#818c99;">${new Date(c.date).toLocaleString()}</span></div>
-            <div class="comment-text">${escapeHtml(c.text)}</div>
-            ${isAdminMode ? `<button class="delete-comment-admin" data-post="${postId}" data-comment="${c.id}" style="margin-top:8px; background:#c0392b; border:none; padding:4px 12px; border-radius:20px; color:white;">Удалить</button>` : ''}
+    <!-- Модалка регистрации -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-register">&times;</span>
+            <h2><i class="fas fa-user-plus"></i> Регистрация</h2>
+            <form id="registerForm">
+                <label>Имя</label>
+                <input type="text" id="regFirstName" placeholder="Иван" required>
+                <label>Фамилия</label>
+                <input type="text" id="regLastName" placeholder="Иванов" required>
+                <label>Номер телефона</label>
+                <input type="tel" id="regPhone" placeholder="+7 999 123 45 67" required>
+                <label>Пароль</label>
+                <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
+                <button type="submit" class="btn-submit">Зарегистрироваться</button>
+            </form>
+            <p class="modal-note">Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
         </div>
-    `).join('');
-    document.getElementById('commentsModal').style.display = 'block';
-    if (isAdminMode) {
-        document.querySelectorAll('.delete-comment-admin').forEach(btn => btn.addEventListener('click', () => deleteComment(btn.dataset.post, btn.dataset.comment)));
-    }
-}
+    </div>
 
-document.getElementById('submitCommentBtn')?.addEventListener('click', () => {
-    const text = document.getElementById('newCommentText').value;
-    if (addComment(currentCommentPostId, text)) {
-        document.getElementById('newCommentText').value = '';
-        openCommentsModal(currentCommentPostId);
-    }
-});
+    <!-- Модалка поста -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Создать пост</h2>
+            <form id="postForm">
+                <input type="text" id="postTitle" placeholder="Заголовок" required>
+                <textarea id="postContent" rows="4" placeholder="Текст новости" required></textarea>
+                <input type="text" id="postImageUrl" placeholder="Ссылка на картинку">
+                <div class="or-divider">или</div>
+                <input type="file" id="postImageFile" accept="image/*">
+                <div id="imagePreview" class="image-preview"></div>
+                <input type="hidden" id="editPostId">
+                <button type="submit" class="btn-submit">Опубликовать</button>
+            </form>
+        </div>
+    </div>
 
-// === НАВИГАЦИЯ ===
-document.getElementById('adminPanelBtn')?.addEventListener('click', () => {
-    const pwd = prompt('Введите пароль администратора:');
-    if (pwd === ADMIN_PASSWORD) {
-        isAdminMode = true;
-        document.getElementById('adminBlock').style.display = 'block';
-        renderAdminPosts();
-        renderPosts();
-        showToast('Режим администрирования включён');
-    } else showToast('Неверный пароль', true);
-});
+    <!-- Модалка комментариев -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-comments">&times;</span>
+            <h2>Комментарии</h2>
+            <div id="commentsList" class="comments-list"></div>
+            <textarea id="newCommentText" rows="2" placeholder="Напишите комментарий..."></textarea>
+            <button id="submitCommentBtn" class="btn-submit">Отправить</button>
+        </div>
+    </div>
 
-document.getElementById('mobileAdminLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('mobileNav')?.classList.remove('active');
-    const pwd = prompt('Введите пароль администратора:');
-    if (pwd === ADMIN_PASSWORD) {
-        isAdminMode = true;
-        document.getElementById('adminBlock').style.display = 'block';
-        renderAdminPosts();
-        renderPosts();
-        showToast('Режим администрирования включён');
-    } else showToast('Неверный пароль', true);
-});
-
-document.getElementById('mobileFeedLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('mobileNav')?.classList.remove('active');
-    document.getElementById('adminBlock').style.display = 'none';
-    renderPosts();
-});
-
-document.getElementById('mobileLoginLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('mobileNav')?.classList.remove('active');
-    showLoginModal();
-});
-
-document.getElementById('openEditorBtn')?.addEventListener('click', () => openPostEditor());
-document.getElementById('addPostBtn')?.addEventListener('click', () => openPostEditor());
-document.getElementById('logoutBtn')?.addEventListener('click', logout);
-
-function showLoginModal() { 
-    const modal = document.getElementById('loginModal');
-    if (modal) modal.style.display = 'block'; 
-}
-document.getElementById('loginForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const phone = document.getElementById('loginPhone').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    if (!phone || !password) { showToast('Заполните телефон и пароль', true); return; }
-    if (loginOrRegister(phone, password)) {
-        const modal = document.getElementById('loginModal');
-        if (modal) modal.style.display = 'none';
-    }
-});
-
-// Тёмная тема
-document.getElementById('themeToggle')?.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    localStorage.setItem('blogTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-});
-document.getElementById('themeToggleMobile')?.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    localStorage.setItem('blogTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    document.getElementById('mobileNav')?.classList.remove('active');
-});
-if (localStorage.getItem('blogTheme') === 'dark') document.body.classList.add('dark-theme');
-
-// Бургер
-const burger = document.getElementById('burgerMenu');
-const mobileNav = document.getElementById('mobileNav');
-if (burger && mobileNav) {
-    burger.addEventListener('click', () => { burger.classList.toggle('active'); mobileNav.classList.toggle('active'); });
-    document.querySelectorAll('.mobile-nav a, .theme-btn-mobile').forEach(link => {
-        link.addEventListener('click', () => { burger.classList.remove('active'); mobileNav.classList.remove('active'); });
-    });
-}
-
-function closeModal(modal) { if (modal) modal.style.display = 'none'; }
-document.querySelectorAll('.close, .close-comments, .close-login').forEach(btn => {
-    btn.onclick = () => {
-        closeModal(document.getElementById('postModal'));
-        closeModal(document.getElementById('commentsModal'));
-        closeModal(document.getElementById('loginModal'));
-    };
-});
-window.onclick = (e) => {
-    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-};
-
-function showToast(msg, isErr = false) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.innerText = msg;
-    toast.style.background = isErr ? '#c0392b' : '#2d4a2d';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function escapeHtml(str) { 
-    if (!str) return '';
-    return str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); 
-}
-
-loadData();
-renderPosts();
+    <footer class="footer"><div class="container"><p>© 2026 Новостник — Новости Новороссийска и Краснодарского края</p></div></footer>
+    <script src="script.js"></script>
+</body>
+</html>
