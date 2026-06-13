@@ -1,6 +1,7 @@
 // === НАСТРОЙКИ ===
 const ADMIN_PASSWORD = 'admin123';
-let posts = [];
+let posts = []; // одобренные посты
+let pendingPosts = []; // посты на модерации
 let users = [];
 let currentUser = null;
 let currentCommentPostId = null;
@@ -10,6 +11,8 @@ let isAdminMode = false;
 function loadData() {
     const savedPosts = localStorage.getItem('newsPosts');
     posts = savedPosts ? JSON.parse(savedPosts) : [];
+    const savedPending = localStorage.getItem('newsPendingPosts');
+    pendingPosts = savedPending ? JSON.parse(savedPending) : [];
     const savedUsers = localStorage.getItem('newsUsers');
     users = savedUsers ? JSON.parse(savedUsers) : [];
     const savedUser = localStorage.getItem('currentNewsUser');
@@ -17,6 +20,7 @@ function loadData() {
     updateUI();
 }
 function savePosts() { localStorage.setItem('newsPosts', JSON.stringify(posts)); }
+function savePending() { localStorage.setItem('newsPendingPosts', JSON.stringify(pendingPosts)); }
 function saveUsers() { localStorage.setItem('newsUsers', JSON.stringify(users)); }
 function saveCurrentUser() {
     if (currentUser) localStorage.setItem('currentNewsUser', JSON.stringify(currentUser));
@@ -54,11 +58,9 @@ function register(firstName, lastName, phone, password) {
     }
     const newUser = {
         id: Date.now(),
-        firstName: firstName,
-        lastName: lastName,
+        firstName, lastName,
         name: firstName + ' ' + lastName,
-        phone: phone,
-        password: password
+        phone, password
     };
     users.push(newUser);
     saveUsers();
@@ -92,7 +94,7 @@ function logout() {
     showToast('Вы вышли');
 }
 
-// === ПОСТЫ ===
+// === ПОСТЫ (ЛЕНТА) ===
 function renderPosts() {
     const container = document.getElementById('postsFeed');
     if (!container) return;
@@ -104,8 +106,8 @@ function renderPosts() {
     container.innerHTML = sorted.map(post => `
         <div class="post-card">
             <div class="post-header">
-                <div class="post-avatar"><i class="fas fa-user-edit"></i></div>
-                <div class="post-author-info"><h3>Редакция Новостника</h3><div class="post-date">${new Date(post.date).toLocaleString('ru-RU')}</div></div>
+                <div class="post-avatar"><i class="fas fa-user"></i></div>
+                <div class="post-author-info"><h3>${escapeHtml(post.authorName)}</h3><div class="post-date">${new Date(post.date).toLocaleString('ru-RU')}</div></div>
             </div>
             <div class="post-title"><strong>${escapeHtml(post.title)}</strong></div>
             <div class="post-content">${escapeHtml(post.content).replace(/\n/g, '<br>')}</div>
@@ -121,17 +123,17 @@ function renderPosts() {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             if (!currentUser) { showLoginModal(); return; }
-            toggleLike(btn.dataset.id);
+            toggleLike(parseInt(btn.dataset.id));
         });
     });
     document.querySelectorAll('.comment-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             if (!currentUser) { showLoginModal(); return; }
-            openCommentsModal(btn.dataset.id);
+            openCommentsModal(parseInt(btn.dataset.id));
         });
     });
     if (isAdminMode) {
-        document.querySelectorAll('.edit-post').forEach(btn => btn.addEventListener('click', () => openPostEditor(btn.dataset.id)));
+        document.querySelectorAll('.edit-post').forEach(btn => btn.addEventListener('click', () => openPostEditor(parseInt(btn.dataset.id))));
         document.querySelectorAll('.delete-post').forEach(btn => btn.addEventListener('click', () => {
             if (confirm('Удалить пост?')) {
                 posts = posts.filter(p => p.id != btn.dataset.id);
@@ -182,6 +184,20 @@ function deleteComment(postId, commentId) {
     }
 }
 
+// === ПРЕДЛОЖЕНИЕ ПОСТА ===
+function proposePost(title, content, imageUrl, authorId, authorName) {
+    const newPost = {
+        id: Date.now(),
+        title, content, imageUrl,
+        authorId, authorName,
+        date: new Date().toISOString(),
+        status: 'pending'
+    };
+    pendingPosts.push(newPost);
+    savePending();
+    showToast('Пост отправлен на модерацию!');
+}
+
 // === АДМИНКА ===
 function renderAdminPosts() {
     const container = document.getElementById('adminPostsList');
@@ -190,11 +206,11 @@ function renderAdminPosts() {
     const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
     container.innerHTML = sorted.map(post => `
         <div class="admin-post-item">
-            <div><strong>${escapeHtml(post.title)}</strong><br><small>${new Date(post.date).toLocaleDateString()}</small></div>
+            <div><strong>${escapeHtml(post.title)}</strong><br><small>${new Date(post.date).toLocaleDateString()}</small><br><small>Автор: ${escapeHtml(post.authorName)}</small></div>
             <div><button class="edit-post-admin" data-id="${post.id}">Ред.</button><button class="delete-post-admin" data-id="${post.id}">Удалить</button></div>
         </div>
     `).join('');
-    document.querySelectorAll('.edit-post-admin').forEach(btn => btn.addEventListener('click', () => openPostEditor(btn.dataset.id)));
+    document.querySelectorAll('.edit-post-admin').forEach(btn => btn.addEventListener('click', () => openPostEditor(parseInt(btn.dataset.id))));
     document.querySelectorAll('.delete-post-admin').forEach(btn => btn.addEventListener('click', () => {
         if (confirm('Удалить пост?')) {
             posts = posts.filter(p => p.id != btn.dataset.id);
@@ -206,192 +222,10 @@ function renderAdminPosts() {
     }));
 }
 
-function openPostEditor(id = null) {
-    const modal = document.getElementById('postModal');
-    document.getElementById('postForm').reset();
-    document.getElementById('editPostId').value = '';
-    document.getElementById('imagePreview').innerHTML = '';
-    document.getElementById('modalTitle').innerText = id ? 'Редактировать пост' : 'Создать пост';
-    if (id) {
-        const post = posts.find(p => p.id == id);
-        if (post) {
-            document.getElementById('postTitle').value = post.title;
-            document.getElementById('postContent').value = post.content;
-            document.getElementById('postImageUrl').value = post.imageUrl || '';
-            if (post.imageUrl) document.getElementById('imagePreview').innerHTML = `<img src="${post.imageUrl}" alt="preview">`;
-            document.getElementById('editPostId').value = id;
-        }
-    }
-    modal.style.display = 'block';
-}
-
-// === ФОРМА ПОСТА ===
-document.getElementById('postForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = document.getElementById('postTitle').value.trim();
-    const content = document.getElementById('postContent').value.trim();
-    let imageUrl = document.getElementById('postImageUrl').value.trim();
-    const file = document.getElementById('postImageFile').files[0];
-    const editId = document.getElementById('editPostId').value;
-    if (!title || !content) { showToast('Заголовок и текст обязательны', true); return; }
-    const save = (url) => {
-        if (editId) {
-            const idx = posts.findIndex(p => p.id == editId);
-            if (idx !== -1) posts[idx] = { ...posts[idx], title, content, imageUrl: url, date: new Date().toISOString() };
-        } else {
-            posts.push({ id: Date.now(), title, content, imageUrl: url, date: new Date().toISOString(), likes: [], comments: [] });
-        }
-        savePosts();
-        renderPosts();
-        if (isAdminMode) renderAdminPosts();
-        closeModal(document.getElementById('postModal'));
-        showToast(editId ? 'Пост обновлён' : 'Пост создан');
-    };
-    if (file) { const reader = new FileReader(); reader.onload = (ev) => save(ev.target.result); reader.readAsDataURL(file); }
-    else save(imageUrl);
-});
-
-// === КОММЕНТАРИИ ===
-function openCommentsModal(postId) {
-    currentCommentPostId = postId;
-    const post = posts.find(p => p.id == postId);
-    const container = document.getElementById('commentsList');
-    if (!post) return;
-    container.innerHTML = (post.comments || []).map(c => `
-        <div class="comment-item">
-            <div class="comment-author">${escapeHtml(c.author)} <span style="font-size:0.7rem; color:#818c99;">${new Date(c.date).toLocaleString()}</span></div>
-            <div class="comment-text">${escapeHtml(c.text)}</div>
-            ${isAdminMode ? `<button class="delete-comment-admin" data-post="${postId}" data-comment="${c.id}" style="margin-top:8px; background:#c0392b; border:none; padding:4px 12px; border-radius:20px; color:white;">Удалить</button>` : ''}
-        </div>
-    `).join('');
-    document.getElementById('commentsModal').style.display = 'block';
-    if (isAdminMode) {
-        document.querySelectorAll('.delete-comment-admin').forEach(btn => btn.addEventListener('click', () => deleteComment(btn.dataset.post, btn.dataset.comment)));
-    }
-}
-
-document.getElementById('submitCommentBtn')?.addEventListener('click', () => {
-    const text = document.getElementById('newCommentText').value;
-    if (addComment(currentCommentPostId, text)) {
-        document.getElementById('newCommentText').value = '';
-        openCommentsModal(currentCommentPostId);
-    }
-});
-
-// === НАВИГАЦИЯ ===
-document.getElementById('welcomeLoginBtn')?.addEventListener('click', () => showLoginModal());
-document.getElementById('welcomeRegisterBtn')?.addEventListener('click', () => showRegisterModal());
-document.getElementById('switchToLogin')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    closeModal(document.getElementById('registerModal'));
-    showLoginModal();
-});
-document.getElementById('switchToRegister')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    closeModal(document.getElementById('loginModal'));
-    showRegisterModal();
-});
-
-function showLoginModal() { document.getElementById('loginModal').style.display = 'block'; }
-function showRegisterModal() { document.getElementById('registerModal').style.display = 'block'; }
-
-document.getElementById('loginForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const phone = document.getElementById('loginPhone').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    if (login(phone, password)) closeModal(document.getElementById('loginModal'));
-});
-document.getElementById('registerForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const firstName = document.getElementById('regFirstName').value.trim();
-    const lastName = document.getElementById('regLastName').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-    const password = document.getElementById('regPassword').value.trim();
-    if (!firstName || !lastName || !phone || !password) { showToast('Заполните все поля', true); return; }
-    if (register(firstName, lastName, phone, password)) closeModal(document.getElementById('registerModal'));
-});
-
-document.getElementById('adminPanelBtn')?.addEventListener('click', () => {
-    const pwd = prompt('Введите пароль администратора:');
-    if (pwd === ADMIN_PASSWORD) {
-        isAdminMode = true;
-        document.getElementById('adminBlock').style.display = 'block';
-        renderAdminPosts();
-        renderPosts();
-        showToast('Режим администрирования');
-    } else showToast('Неверный пароль', true);
-});
-document.getElementById('mobileAdminLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('mobileNav')?.classList.remove('active');
-    const pwd = prompt('Введите пароль администратора:');
-    if (pwd === ADMIN_PASSWORD) {
-        isAdminMode = true;
-        document.getElementById('adminBlock').style.display = 'block';
-        renderAdminPosts();
-        renderPosts();
-        showToast('Режим администрирования');
-    } else showToast('Неверный пароль', true);
-});
-document.getElementById('mobileFeedLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('mobileNav')?.classList.remove('active');
-    document.getElementById('adminBlock').style.display = 'none';
-    renderPosts();
-});
-document.getElementById('mobileLogoutLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('mobileNav')?.classList.remove('active');
-    logout();
-});
-document.getElementById('openEditorBtn')?.addEventListener('click', () => openPostEditor());
-document.getElementById('addPostBtn')?.addEventListener('click', () => openPostEditor());
-document.getElementById('logoutBtn')?.addEventListener('click', logout);
-
-// Тёмная тема
-document.getElementById('themeToggle')?.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    localStorage.setItem('newsTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-});
-document.getElementById('themeToggleMobile')?.addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    localStorage.setItem('newsTheme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    document.getElementById('mobileNav')?.classList.remove('active');
-});
-if (localStorage.getItem('newsTheme') === 'dark') document.body.classList.add('dark-theme');
-
-// Бургер
-const burger = document.getElementById('burgerMenu');
-const mobileNav = document.getElementById('mobileNav');
-if (burger && mobileNav) {
-    burger.addEventListener('click', () => { burger.classList.toggle('active'); mobileNav.classList.toggle('active'); });
-    document.querySelectorAll('.mobile-nav a, .theme-btn-mobile').forEach(link => {
-        link.addEventListener('click', () => { burger.classList.remove('active'); mobileNav.classList.remove('active'); });
-    });
-}
-
-function closeModal(modal) { if (modal) modal.style.display = 'none'; }
-document.querySelectorAll('.close, .close-comments, .close-login, .close-register').forEach(btn => {
-    btn.onclick = () => {
-        closeModal(document.getElementById('postModal'));
-        closeModal(document.getElementById('commentsModal'));
-        closeModal(document.getElementById('loginModal'));
-        closeModal(document.getElementById('registerModal'));
-    };
-});
-window.onclick = (e) => {
-    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-};
-
-function showToast(msg, isErr = false) {
-    const toast = document.getElementById('toast');
-    toast.innerText = msg;
-    toast.style.background = isErr ? '#c0392b' : '#2d4a2d';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
-
-loadData();
-renderPosts();
+function renderModeration() {
+    const container = document.getElementById('moderationList');
+    if (!container) return;
+    if (pendingPosts.length === 0) { container.innerHTML = '<p>Нет постов на модерации</p>'; return; }
+    container.innerHTML = pendingPosts.map(post => `
+        <div class="moderation-item">
+            <div><strong>${escapeHtml(post.title)}</strong><br><small>Ав
