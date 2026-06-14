@@ -83,13 +83,13 @@
         </div>
     </main>
 
-    <!-- Модалки (вход, регистрация, предложить пост, создать пост, комментарии) -->
+    <!-- Модалка входа -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-login">&times;</span>
-            <h2><i class="fas fa-sign-in-alt"></i> Вход</h2>
+            <h2>Вход</h2>
             <form id="loginForm">
-                <label>Номер телефона</label>
+                <label>Телефон</label>
                 <input type="tel" id="loginPhone" placeholder="+7 999 123 45 67" required>
                 <label>Пароль</label>
                 <input type="password" id="loginPassword" placeholder="Пароль" required>
@@ -99,16 +99,15 @@
         </div>
     </div>
 
+    <!-- Модалка регистрации -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <span class="close-register">&times;</span>
-            <h2><i class="fas fa-user-plus"></i> Регистрация</h2>
+            <h2>Регистрация</h2>
             <form id="registerForm">
-                <label>Имя</label>
-                <input type="text" id="regFirstName" placeholder="Иван" required>
-                <label>Фамилия</label>
-                <input type="text" id="regLastName" placeholder="Иванов" required>
-                <label>Номер телефона</label>
+                <label>Имя и фамилия</label>
+                <input type="text" id="regName" placeholder="Иван Иванов" required>
+                <label>Телефон</label>
                 <input type="tel" id="regPhone" placeholder="+7 999 123 45 67" required>
                 <label>Пароль</label>
                 <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
@@ -118,14 +117,15 @@
         </div>
     </div>
 
+    <!-- Модалка предложения поста -->
     <div id="proposeModal" class="modal">
         <div class="modal-content">
             <span class="close-propose">&times;</span>
-            <h2><i class="fas fa-plus-circle"></i> Предложить новость</h2>
+            <h2>Предложить новость</h2>
             <form id="proposeForm">
                 <input type="text" id="proposeTitle" placeholder="Заголовок" required>
                 <textarea id="proposeContent" rows="4" placeholder="Текст новости" required></textarea>
-                <input type="text" id="proposeImageUrl" placeholder="Ссылка на картинку (необязательно)">
+                <input type="text" id="proposeImageUrl" placeholder="Ссылка на картинку">
                 <div class="or-divider">или</div>
                 <input type="file" id="proposeImageFile" accept="image/*">
                 <div id="proposeImagePreview" class="image-preview"></div>
@@ -135,6 +135,7 @@
         </div>
     </div>
 
+    <!-- Модалка создания поста (админ) -->
     <div id="postModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -146,12 +147,12 @@
                 <div class="or-divider">или</div>
                 <input type="file" id="postImageFile" accept="image/*">
                 <div id="imagePreview" class="image-preview"></div>
-                <input type="hidden" id="editPostId">
                 <button type="submit" class="btn-submit">Опубликовать</button>
             </form>
         </div>
     </div>
 
+    <!-- Модалка комментариев -->
     <div id="commentsModal" class="modal">
         <div class="modal-content">
             <span class="close-comments">&times;</span>
@@ -162,7 +163,12 @@
         </div>
     </div>
 
-    <footer class="footer"><div class="container"><p>© 2026 Новостник — Новости Новороссийска и Краснодарского края</p></div></footer>
-    <script src="script.js"></script>
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Новостник — Новости Новороссийска и Краснодарского края</p>
+        </div>
+    </footer>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
