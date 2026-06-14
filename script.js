@@ -397,7 +397,6 @@ function renderAdminPosts(posts) {
 }
 
 function openPostEditor(id = null) {
-    // TODO: редактирование постов
     showToast('Редактирование пока в разработке');
 }
 
