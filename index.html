@@ -19,83 +19,76 @@
     </div>
     <nav class="mobile-nav" id="mobileNav">
         <ul>
-            <li><a href="#" id="mobileFeedLink"><i class="fas fa-newspaper"></i> Лента</a></li>
-            <li><a href="#" id="mobileAdminLink"><i class="fas fa-user-shield"></i> Админ</a></li>
-            <li><a href="#" id="mobileProposeLink"><i class="fas fa-plus-circle"></i> Предложить пост</a></li>
-            <li><a href="#" id="mobileLogoutLink"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
-            <li><button id="themeToggleMobile" class="theme-btn-mobile"><i class="fas fa-moon"></i> Тёмная тема</button></li>
+            <li><a href="#" id="mobileFeedLink">📰 Лента</a></li>
+            <li><a href="#" id="mobileAdminLink">🛡️ Админ</a></li>
+            <li><a href="#" id="mobileProposeLink">➕ Предложить пост</a></li>
+            <li><a href="#" id="mobileLogoutLink">🚪 Выйти</a></li>
+            <li><button id="themeToggleMobile">🌙 Тёмная тема</button></li>
         </ul>
     </nav>
 
     <header class="header">
         <div class="container">
-            <div class="logo"><i class="fas fa-newspaper"></i><span>Новостник</span></div>
+            <div class="logo">📰 Новостник</div>
             <div class="header-actions">
-                <button id="themeToggle" class="theme-btn"><i class="fas fa-moon"></i></button>
+                <button id="themeToggle">🌙</button>
                 <div class="user-profile" id="userProfile" style="display: none;">
                     <i class="fas fa-user-circle"></i><span id="userName"></span>
-                    <button id="logoutBtn" class="logout-small"><i class="fas fa-sign-out-alt"></i></button>
+                    <button id="logoutBtn">🚪</button>
                 </div>
-                <button id="adminPanelBtn" class="admin-panel-btn"><i class="fas fa-user-shield"></i></button>
+                <button id="adminPanelBtn">🛡️</button>
             </div>
         </div>
     </header>
 
     <main>
         <div class="container">
-            <div id="welcomeBlock" class="welcome-block">
+            <div id="welcomeBlock">
                 <div class="welcome-card">
-                    <i class="fas fa-newspaper"></i>
                     <h1>Новостник</h1>
                     <p>Новости Новороссийска и Краснодарского края</p>
                     <div class="welcome-buttons">
-                        <button id="welcomeLoginBtn" class="btn-primary">Войти</button>
-                        <button id="welcomeRegisterBtn" class="btn-secondary">Регистрация</button>
+                        <button id="welcomeLoginBtn">Войти</button>
+                        <button id="welcomeRegisterBtn">Регистрация</button>
                     </div>
-                    <p class="support-link">Если нашли ошибку — напишите в поддержку: <a href="mailto:support@novostnik.ru">support@novostnik.ru</a></p>
+                    <small>support@novostnik.ru</small>
                 </div>
             </div>
 
             <div id="feedBlock" style="display: none;">
                 <div class="create-post-card" id="createPostCard" style="display: none;">
-                    <div class="create-post-header">
-                        <div class="admin-avatar-placeholder"><i class="fas fa-user"></i></div>
-                        <div class="create-post-input" id="openProposeBtn">Предложить новость</div>
-                    </div>
+                    <div class="create-post-input" id="openProposeBtn">➕ Предложить новость</div>
                 </div>
-                <div id="postsFeed" class="posts-feed"></div>
+                <div id="postsFeed"></div>
             </div>
 
-            <div id="adminBlock" class="admin-block" style="display: none;">
+            <div id="adminBlock" style="display: none;">
                 <div class="admin-tabs">
                     <button class="admin-tab active" data-tab="postsTab">📝 Посты</button>
                     <button class="admin-tab" data-tab="moderationTab">⏳ Модерация (<span id="moderationCount">0</span>)</button>
                 </div>
                 <div id="postsTab" class="admin-tab-content active">
-                    <div class="admin-header"><h2>Управление постами</h2><button id="addPostBtn" class="add-post-btn"><i class="fas fa-plus"></i> Создать пост</button></div>
+                    <button id="addPostBtn">➕ Создать пост</button>
                     <div id="adminPostsList"></div>
                 </div>
                 <div id="moderationTab" class="admin-tab-content">
-                    <h2>Предложенные посты (на модерации)</h2>
                     <div id="moderationList"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Модалки -->
+    <!-- МОДАЛКИ -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close-login">&times;</span>
             <h2>Вход</h2>
             <form id="loginForm">
-                <label>Телефон</label>
-                <input type="tel" id="loginPhone" placeholder="+7 999 123 45 67" required>
-                <label>Пароль</label>
+                <input type="tel" id="loginPhone" placeholder="Телефон" required>
                 <input type="password" id="loginPassword" placeholder="Пароль" required>
-                <button type="submit" class="btn-submit">Войти</button>
+                <button type="submit">Войти</button>
             </form>
-            <p class="modal-note">Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
+            <p>Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
         </div>
     </div>
 
@@ -104,15 +97,12 @@
             <span class="close-register">&times;</span>
             <h2>Регистрация</h2>
             <form id="registerForm">
-                <label>Имя и фамилия</label>
-                <input type="text" id="regName" placeholder="Иван Иванов" required>
-                <label>Телефон</label>
-                <input type="tel" id="regPhone" placeholder="+7 999 123 45 67" required>
-                <label>Пароль</label>
-                <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
-                <button type="submit" class="btn-submit">Зарегистрироваться</button>
+                <input type="text" id="regName" placeholder="Имя и фамилия" required>
+                <input type="tel" id="regPhone" placeholder="Телефон" required>
+                <input type="password" id="regPassword" placeholder="Пароль" required>
+                <button type="submit">Зарегистрироваться</button>
             </form>
-            <p class="modal-note">Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
+            <p>Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
         </div>
     </div>
 
@@ -122,29 +112,26 @@
             <h2>Предложить новость</h2>
             <form id="proposeForm">
                 <input type="text" id="proposeTitle" placeholder="Заголовок" required>
-                <textarea id="proposeContent" rows="4" placeholder="Текст новости" required></textarea>
+                <textarea id="proposeContent" rows="4" placeholder="Текст" required></textarea>
                 <input type="text" id="proposeImageUrl" placeholder="Ссылка на картинку">
-                <div class="or-divider">или</div>
                 <input type="file" id="proposeImageFile" accept="image/*">
-                <div id="proposeImagePreview" class="image-preview"></div>
-                <button type="submit" class="btn-submit">Отправить на модерацию</button>
+                <div id="proposeImagePreview"></div>
+                <button type="submit">Отправить</button>
             </form>
-            <p class="modal-note">Пост уйдёт на проверку админу. После одобрения появится в ленте.</p>
         </div>
     </div>
 
     <div id="postModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2 id="modalTitle">Создать пост</h2>
+            <h2>Создать пост</h2>
             <form id="postForm">
                 <input type="text" id="postTitle" placeholder="Заголовок" required>
-                <textarea id="postContent" rows="4" placeholder="Текст новости" required></textarea>
+                <textarea id="postContent" rows="4" placeholder="Текст" required></textarea>
                 <input type="text" id="postImageUrl" placeholder="Ссылка на картинку">
-                <div class="or-divider">или</div>
                 <input type="file" id="postImageFile" accept="image/*">
-                <div id="imagePreview" class="image-preview"></div>
-                <button type="submit" class="btn-submit">Опубликовать</button>
+                <div id="imagePreview"></div>
+                <button type="submit">Опубликовать</button>
             </form>
         </div>
     </div>
@@ -153,16 +140,16 @@
         <div class="modal-content">
             <span class="close-comments">&times;</span>
             <h2>Комментарии</h2>
-            <div id="commentsList" class="comments-list"></div>
-            <textarea id="newCommentText" rows="2" placeholder="Напишите комментарий..."></textarea>
-            <button id="submitCommentBtn" class="btn-submit">Отправить</button>
+            <div id="commentsList"></div>
+            <textarea id="newCommentText" rows="2" placeholder="Ваш комментарий..."></textarea>
+            <button id="submitCommentBtn">Отправить</button>
         </div>
     </div>
 
+    <div class="admin-trigger" id="adminTrigger">🛡️</div>
+
     <footer class="footer">
-        <div class="container">
-            <p>© 2026 Новостник — Новости Новороссийска и Краснодарского края</p>
-        </div>
+        <p>© 2026 Новостник — Новости Новороссийска</p>
     </footer>
 
     <script src="script.js"></script>
