@@ -1,10 +1,12 @@
-import { supabase } from './supabase.js';
+// === НАСТРОЙКИ ===
+const supabaseUrl = 'https://iafkyliwyqaadwavaalu.supabase.co';
+const supabaseKey = 'sb_publishable_FV7T0KpZp7bORF2Vd1r8_Q_L6SZn1f6';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
+const ADMIN_PASSWORD = 'admin123';
 let currentUser = null;
 let currentCommentPostId = null;
 let isAdminMode = false;
-const ADMIN_PASSWORD = 'admin123';
 
 // === ВСПОМОГАТЕЛЬНЫЕ ===
 function showToast(msg, isErr = false) {
@@ -33,7 +35,7 @@ async function register(name, phone, password) {
     
     if (error) {
         if (error.code === '23505') showToast('Такой номер уже зарегистрирован', true);
-        else showToast('Ошибка регистрации', true);
+        else showToast('Ошибка регистрации: ' + error.message, true);
         return false;
     }
     
@@ -51,7 +53,7 @@ async function login(phone, password) {
         .select('*')
         .eq('phone', phone)
         .eq('password', password)
-        .single();
+        .maybeSingle();
     
     if (error || !data) {
         showToast('Неверный телефон или пароль', true);
@@ -83,12 +85,12 @@ function updateUI() {
     if (currentUser) {
         profile.style.display = 'flex';
         document.getElementById('userName').innerText = currentUser.name.split(' ')[0];
-        createCard.style.display = 'flex';
+        if (createCard) createCard.style.display = 'flex';
         welcomeBlock.style.display = 'none';
         feedBlock.style.display = 'block';
     } else {
         profile.style.display = 'none';
-        createCard.style.display = 'none';
+        if (createCard) createCard.style.display = 'none';
         welcomeBlock.style.display = 'flex';
         feedBlock.style.display = 'none';
         document.getElementById('adminBlock').style.display = 'none';
@@ -104,7 +106,7 @@ async function loadPosts() {
         .order('created_at', { ascending: false });
     
     if (error) {
-        showToast('Ошибка загрузки постов', true);
+        console.error('Ошибка загрузки постов:', error);
         return;
     }
     
@@ -136,7 +138,6 @@ function renderPosts(posts) {
         </div>
     `).join('');
     
-    // Загружаем лайки и комментарии для каждого поста
     for (let post of posts) {
         loadLikes(post.id);
         loadCommentsCount(post.id);
@@ -199,7 +200,7 @@ async function toggleLike(postId) {
         .select('*')
         .eq('post_id', postId)
         .eq('user_id', currentUser.id)
-        .single();
+        .maybeSingle();
     
     if (existing) {
         await supabase.from('likes').delete().eq('id', existing.id);
@@ -309,7 +310,7 @@ document.getElementById('proposeForm').addEventListener('submit', async (e) => {
     }
 });
 
-// === АДМИНКА: МОДЕРАЦИЯ ===
+// === АДМИНКА ===
 async function loadModeration() {
     const { data, error } = await supabase
         .from('pending_posts')
@@ -317,8 +318,8 @@ async function loadModeration() {
         .order('created_at', { ascending: false });
     
     if (error) return;
-    renderModeration(data);
-    document.getElementById('moderationCount').innerText = data.length;
+    renderModeration(data || []);
+    document.getElementById('moderationCount').innerText = data?.length || 0;
 }
 
 function renderModeration(pending) {
@@ -361,14 +362,13 @@ function renderModeration(pending) {
     });
 }
 
-// === АДМИНКА: УПРАВЛЕНИЕ ПОСТАМИ ===
 async function loadAdminPosts() {
     const { data, error } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
     
-    if (!error) renderAdminPosts(data);
+    if (!error) renderAdminPosts(data || []);
 }
 
 function renderAdminPosts(posts) {
@@ -400,7 +400,7 @@ function openPostEditor(id = null) {
     showToast('Редактирование пока в разработке');
 }
 
-// === ФОРМА НОВОГО ПОСТА (АДМИН) ===
+// === ФОРМА НОВОГО ПОСТА ===
 document.getElementById('postForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = document.getElementById('postTitle').value.trim();
